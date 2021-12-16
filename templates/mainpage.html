@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{page_title}}</title>
+</head>
+<body style="background-color:orange;">
+<h1 style="font-size:5vw">Airport Ground Transportation Predictor</h1><br />
+<form action="gresponse" method="get">
+<label for="airportname"><h1 style="font-size:5vw">Please Enter Airport Name:</h1></label>
+<h1 style="font-size:3vw">
+  <input style="font-size:36pt;" type="text" id="airportname" name="airportname" /><br />
+  <input style="width:200px;font-size:30pt;" type="submit" value="Go" name="gobtn"/>
+</h1>
+</form>
+
+{% if prompt %}
+<font size = "7">{{prompt}}</font><br />
+{% endif %}
+
+{% if flightresults %}
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['Flight', 'Time Left']
+
+          {% for key, value in flightresults.items() %}
+          ,['{{ key }}', '{{value }}']
+          {% endfor %}
+
+            ]);
+
+        data.addColumn('timeofday', 'Time of Day');
+
+        var options = {
+          title: 'Number of Flights Arriving Today at {{airport}} (In minutes from current time of {{curtime}})',
+          legend: { position: 'none' },
+          colors: ['#e7711c'],
+          histogram: { bucketSize: 30 },
+
+          hAxis: {
+            ticks: [0, 30, 60, 90, 120, 150, 180, 210, 240, 270]
+          },
+          bar: { gap: 0 }
+        };
+
+        var chart = new google.visualization.Histogram(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 1000px; height: 500px;"></div>
+  </body>
+{% endif %}
+</body>
+</html>
